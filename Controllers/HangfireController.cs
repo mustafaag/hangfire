@@ -27,6 +27,26 @@ namespace Hangfire_webapi.Controllers
             return Ok( $"JobId: {jobId}, Welcome email send to user!");
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult Discount()
+        {
+            int delayInSeconds = 30;
+
+            var jobID = BackgroundJob.Schedule(() => SendWelcomeEmail("Discount aplied"), TimeSpan.FromSeconds(delayInSeconds));
+
+            return Ok($"JobId: {jobID}, Discound email will be sent after {delayInSeconds}  to user!");
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult DatabaseUpdate()
+        {
+            RecurringJob.AddOrUpdate(() =>  Console.WriteLine("Database updated"), Cron.Minutely);
+
+            return Ok($"Database check job initiated");
+        }
+
 
         public void SendWelcomeEmail(string text)
         {
