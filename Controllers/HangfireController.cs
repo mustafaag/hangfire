@@ -43,8 +43,20 @@ namespace Hangfire_webapi.Controllers
         public IActionResult DatabaseUpdate()
         {
             RecurringJob.AddOrUpdate(() =>  Console.WriteLine("Database updated"), Cron.Minutely);
-
+            
             return Ok($"Database check job initiated");
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult Confirm()
+        {
+            int delayInSeconds = 30;
+
+            var parentJobId = BackgroundJob.Schedule(() => SendWelcomeEmail("You asked to unsubscribe"), TimeSpan.FromSeconds(delayInSeconds));
+
+            BackgroundJob.ContinueJobWith(parentJobId, () => Console.WriteLine("You were unsubscribed"));
+            return Ok("Confirmation job created");
         }
 
 
